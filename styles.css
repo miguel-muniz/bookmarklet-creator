@@ -1,0 +1,6 @@
+:root {
+    --pico-font-size: 100% !important;
+}
+textarea {
+    font-family: var(--pico-font-family-monospace);
+}

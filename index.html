@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Boomarklet Maker</title>
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/picocss/2.1.1/pico.min.css"
+        />
+
+        <link rel="stylesheet" href="styles.css" />
+    </head>
+    <body>
+        <main class="container">
+            <hgroup>
+                <h1>Bookmarklet Maker</h1>
+                <p>
+                    A simple browser tool for creating bookmarklets from
+                    JavaScript, with an optional reverse conversion to easily
+                    edit existing bookmarklets.
+                </p>
+            </hgroup>
+            <hr />
+            <h3>Input</h3>
+            <label>
+                Title
+                <input id="filename" type="text" value="Edit Webpage" />
+            </label>
+            <label>
+                Code
+                <textarea rows="6">document.designMode = 'on'</textarea>
+            </label>
+            <button>Generate Bookmarklet</button>
+            <button class="secondary outline">Clear Code</button>
+            <hr />
+            <h3>Output</h3>
+            <label>
+                Bookmarklet
+                <textarea rows="6">document.designMode = 'on'</textarea>
+            </label>
+            <button class="secondary outline">
+                Convert Bookmarklet to Code
+            </button>
+            <hr />
+            <p>Drag and drop the link below to your bookmarks:</p>
+            <p>
+                <a
+                    href="javascript:(function()%7Bdocument.designMode%20%3D%20'on'%7D)()%3B"
+                    >Edit Webpage</a
+                >
+            </p>
+        </main>
+
+        <script src="https://unpkg.com/prettier@3.3.3/standalone.js"></script>
+        <script src="https://unpkg.com/prettier@3.3.3/plugins/babel.js"></script>
+        <script src="https://unpkg.com/prettier@3.3.3/plugins/estree.js"></script>
+        <script src="/script.js"></script>
+    </body>
+</html>
