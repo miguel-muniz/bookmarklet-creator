@@ -8,10 +8,31 @@ const convertButton = document.querySelectorAll('button')[2];
 
 const bookmarkletLink = document.querySelector('main a');
 
-function formatAsBookmarklet(code) {
-    const trimmedCode = code.trim();
+function readBookmarkletSource(code) {
+    const prefix = '(function(){\n';
+    const comments = [];
+    acorn.parse(prefix + code + '\n})();', {
+        ecmaVersion: 'latest',
+        onComment: comments,
+    });
 
-    return `javascript:(function(){${encodeURIComponent(trimmedCode)}})();`;
+    let title;
+    let cursor = 0;
+    let body = '';
+    for (const comment of comments) {
+        const start = comment.start - prefix.length;
+        const end = comment.end - prefix.length;
+        const previousCode = code.slice(cursor, start);
+
+        if (!title && !comment.block && !body.trim() && !previousCode.trim()) {
+            title = /^\s*@bookmarklet[ \t]+(.+)$/.exec(comment.value)?.[1].trim();
+        }
+
+        body += previousCode + (code.slice(start, end).match(/[\r\n\u2028\u2029]/g)?.join('') || ' ');
+        cursor = end;
+    }
+
+    return { title, body: (body + code.slice(cursor)).trim() };
 }
 
 function decodeBookmarklet(bookmarklet) {
@@ -55,14 +76,29 @@ function updateLink(bookmarklet) {
 }
 
 generateButton.addEventListener('click', () => {
-    const code = codeTextarea.value;
-    const bookmarklet = formatAsBookmarklet(code);
+    let source;
+    try {
+        source = readBookmarkletSource(codeTextarea.value);
+    } catch (error) {
+        codeTextarea.setCustomValidity(error.message);
+        codeTextarea.reportValidity();
+        return;
+    }
+
+    if (source.title) {
+        titleInput.value = source.title;
+    }
+
+    const bookmarklet = `javascript:(function(){${encodeURIComponent(source.body)}})();`;
 
     bookmarkletTextarea.value = bookmarklet;
     updateLink(bookmarklet);
 });
 
+codeTextarea.addEventListener('input', () => codeTextarea.setCustomValidity(''));
+
 clearButton.addEventListener('click', () => {
+    codeTextarea.setCustomValidity('');
     codeTextarea.value = '';
     codeTextarea.focus();
 });
@@ -73,6 +109,7 @@ convertButton.addEventListener('click', async () => {
     const formattedCode = await formatCode(code);
 
     codeTextarea.value = formattedCode;
+    codeTextarea.setCustomValidity('');
 });
 
 titleInput.addEventListener('input', () => {
